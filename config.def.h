@@ -59,10 +59,13 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "urxvt", NULL };
 
+void switch_kb(const Arg *arg);
+
 static Key keys[] = {
 	/* modifier             key    function        argument */
 	{ MODKEY,               33,    spawn,          {.v = dmenucmd } }, // p
 	{ MODKEY,               36,    spawn,          {.v = termcmd } }, // Return
+	{ MODKEY,               105,   switch_kb,      {0} },             // right control
 	{ MODKEY,               56,    togglebar,      {0} },             // b
 	{ MODKEY,               44,    focusstack,     {.i = +1 } },      // j
 	{ MODKEY,               45,    focusstack,     {.i = -1 } },      // k
@@ -114,4 +117,24 @@ static Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
+
+static const char* kb_layouts[][2] = {
+	{ "us", NULL },
+	{ "cz", "qwerty" },
+};
+static int current_kb_layout = 0;
+
+void
+switch_kb(const Arg *arg)
+{
+	current_kb_layout = (current_kb_layout + 1) % LENGTH(kb_layouts);
+	const char* cmd[] = {
+		"setxkbmap",
+		kb_layouts[current_kb_layout][0],
+		kb_layouts[current_kb_layout][1],
+		NULL
+	};
+	Arg a = { .v = cmd };
+	spawn(&a);
+}
 
