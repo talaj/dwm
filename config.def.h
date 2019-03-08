@@ -125,16 +125,18 @@ static const char* kb_layouts[][2] = {
 static int current_kb_layout = 0;
 
 void
+set_kb(int layout_index)
+{
+	const char** layout = kb_layouts[layout_index];
+	const char* cmd[] = { "setxkbmap", layout[0], layout[1], NULL };
+	Arg a = { .v = cmd };
+	spawn(&a);
+}
+
+void
 switch_kb(const Arg *arg)
 {
 	current_kb_layout = (current_kb_layout + 1) % LENGTH(kb_layouts);
-	const char* cmd[] = {
-		"setxkbmap",
-		kb_layouts[current_kb_layout][0],
-		kb_layouts[current_kb_layout][1],
-		NULL
-	};
-	Arg a = { .v = cmd };
-	spawn(&a);
+	set_kb(current_kb_layout);
 }
 
